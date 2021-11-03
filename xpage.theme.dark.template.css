@@ -1,0 +1,38 @@
+.x-btn {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .2), 0 1px 1px 0 rgba(0, 0, 0, .14), 0 2px 1px -1px rgba(0, 0, 0, .12);
+    color: #436db5;
+    border: 1px solid #436db5;
+    margin: 5px;
+    padding: 3px 15px 3px 15px;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.x-btn:hover {
+    color: white;
+    border: 1px solid #7da6ec;
+}
+
+.x-btn:focus {
+    color: white;
+    border: 1px solid #7da6ec;
+}
+
+.x-btn:active {
+    color: white;
+    border: 1px solid #7da6ec;
+}
+
+.x-input {
+    padding: 5px;
+    margin: 5px;
+    background-color: rgba(250, 250, 250, .1);
+    color: #a7a7a7;
+    border: 1px solid #436db5;
+}
+
+.x-text {
+    padding: 5px;
+    margin: 5px;
+    color: #3c8dbc !important;
+}

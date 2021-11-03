@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>资源下载</title>
+    <link rel="stylesheet" href="./bootstrap.min.css">
+    <link rel="stylesheet" href="./fontawesome-free/css/all.css">
+    <link id="theme" rel="stylesheet" href="../xpage.theme.light.template.css">
+    <link id="theme-bg" rel="stylesheet" href="./light.css">
+    <style>
+        .card {
+            margin: 15px;
+        }
+
+        #ul li h5 {
+            margin-bottom: 0 !important;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h3>常用软件下载</h3>
+                        </div>
+                        <div class="col-md-5 text-right">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="input" placeholder="请输入关键字...">
+                                <div class="input-group-append">
+                                    <input type="button" class="btn btn-success" id="btn-clear" value="清空">
+                                    <input type="button" class="btn btn-primary" id="btn-filter" value="查询">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-right">
+                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                <label class="btn btn-secondary active">
+                                    <input type="radio" name="options" id="option1" checked>白天模式
+                                </label>
+                                <label class="btn btn-secondary">
+                                    <input type="radio" name="options" id="option2">夜间模式
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <ul id="ul"></ul>
+                        <div id="page"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="data.js"></script>
+<script src="../xpage.js"></script>
+<script>
+    autoTheme();
+
+    const autoSize = Math.ceil((window.innerHeight - 400) / 50);
+
+    const MY_SETTING = xpage.defaultSetting;
+    MY_SETTING.btnFirst.content = '';
+    MY_SETTING.btnLast.content = '';
+    MY_SETTING.btnJump.content = '';
+    MY_SETTING.btnNext.content = '';
+    MY_SETTING.btnPre.content = '';
+    MY_SETTING.size = [autoSize, 5, 10, 30];
+    const PAGE = xpage.init('page', MY_SETTING);
+
+    listData();
+
+    document.querySelector('.btn-group-toggle').addEventListener('click', e => {
+        if (e.target.id === 'option1') {
+            document.getElementById('option2').parentElement.classList.remove('active');
+            document.getElementById('option1').parentElement.classList.add('active');
+            document.getElementById('theme').href = '../xpage.theme.light.template.css';
+            document.getElementById('theme-bg').href = './light.css';
+            setCookie('theme', 'light');
+            return;
+        }
+        if (e.target.id === 'option2') {
+            document.getElementById('option1').parentElement.classList.remove('active');
+            document.getElementById('option2').parentElement.classList.add('active');
+            document.getElementById('theme').href = '../xpage.theme.dark.template.css';
+            document.getElementById('theme-bg').href = './dark.css';
+            setCookie('theme', 'dark');
+        }
+    });
+
+    document.getElementById('btn-filter').addEventListener('click', () => {
+        listData();
+    });
+    document.getElementById('btn-clear').addEventListener('click', () => {
+        document.getElementById('input').value = '';
+        document.getElementById('btn-filter').click();
+    });
+    document.getElementById('ul').addEventListener('click', e => {
+        const elem = e.target;
+        if (elem.tagName === 'A' && elem.classList.contains('badge')) {
+            document.getElementById('input').value = elem.innerText;
+            document.getElementById('btn-filter').click();
+        }
+    });
+
+    function setCookie(key, value) {
+        const Days = 30;
+        const exp = new Date();
+        exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+        document.cookie = `${key}=${value};expires=${exp.toUTCString()}`
+    }
+
+    function autoTheme() {
+        const cookie = document.cookie;
+        if (cookie.includes('dark')) {
+            document.getElementById('theme').href = '../xpage.theme.dark.template.css';
+            document.getElementById('theme-bg').href = './dark.css';
+        } else {
+            document.getElementById('theme').href = '../xpage.theme.light.template.css';
+            document.getElementById('theme-bg').href = './light.css';
+        }
+    }
+
+    function listData() {
+        PAGE.resource(SOURCE, {
+            success: data => {
+                document.getElementById('ul').innerHTML = data.map(item => {
+                    const badges = item.tag.map(t => `<a href='javascript:void(0)' class='badge badge-warning'>${t}</a>&nbsp;`).join('');
+                    return `
+                        <li>
+                            <h5 class="card-title"><a href="javascript:void(0)" target="_blank">${item.title}</a>&nbsp;&nbsp;&nbsp;${badges}</h5>
+                            <p>${item.content}</p>
+                        </li> `
+                }).join('');
+            },
+            filter: item => {
+                const keyword = document.getElementById('input').value;
+                if (keyword.trim() === '')
+                    return true;
+                if (item.tag.includes(keyword))
+                    return true;
+                const k = keyword.toLocaleLowerCase();
+                return item.title.toLocaleLowerCase().includes(k) || item.content.toLocaleLowerCase().includes(k);
+
+            }
+        })
+    }
+</script>
+</body>
+
+</html>
